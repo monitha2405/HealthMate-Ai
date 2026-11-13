@@ -180,12 +180,3 @@ HealthMate AI enforces strict non-diagnostic and non-prescriptive safety protoco
 5. **Human-in-the-Loop Verification:** Newly extracted lab report values are flagged for user review before official verification.
 
 ---
-
-## 9. Final-Year Viva Preparation Cheat Sheet
-
-- **Q: Why PostgreSQL without pgvector?**  
-  *A:* pgvector requires compiling C extensions on the operating system, which is complex on standard Windows systems without build tools. By utilizing PostgreSQL's native `JSONB` data type to store high-dimensional embeddings and computing cosine similarity via Node.js vector dot products, we achieve genuine semantic search with zero external dependencies and 100% portability.
-- **Q: How is cross-user data isolation guaranteed?**  
-  *A:* Every single query uses parameterized SQL with `WHERE guest_id = $1`. The `guest_id` is derived strictly from the server-side validated HttpOnly cookie session hash, never from user-supplied request headers or frontend state.
-- **Q: How does the orchestrator determine which agent to invoke?**  
-  *A:* The orchestrator uses deterministic multi-layer intent classification. Emergency symptoms are checked first for immediate safety bypass. Next, semantic domain keywords classify the query into documents, trends, nutrition, wellness, or general knowledge.
