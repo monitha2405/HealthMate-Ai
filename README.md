@@ -1,10 +1,5 @@
 # HealthMate AI — Intelligent Healthcare Assistant & Clinical Document Analysis
 
-> **Architecture:** PostgreSQL 16 (Standard JSONB Embeddings — No pgvector, No Docker, No WSL Required)  
-> **AI Engine:** Official Google GenAI SDK (`@google/genai` / Gemini 1.5 Flash & text-embedding-004)  
-> **Session Security:** Cryptographic Login-Free Automatic Guest Sessions with HttpOnly Cookies  
-> **Medical Disclaimer:** HealthMate AI is an educational decision-support platform designed to demonstrate Large Language Model architectures, application-layer cosine vector Retrieval-Augmented Generation (RAG), and multi-agent coordination. It does **not** provide clinical diagnosis, prescribe medication, or offer emergency triage. Always consult qualified healthcare professionals.
-
 ---
 
 ## 1. System Architecture Overview
