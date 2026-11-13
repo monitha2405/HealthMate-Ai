@@ -1,0 +1,1323 @@
+# MASTER PROMPT — HEALTHMATE AI FINAL COMPLETION, SECURITY AUDIT, IMPLEMENTATION, TESTING AND ZIP DELIVERY
+
+## 1. YOUR ROLE
+
+Act as a senior full-stack software engineer, AI/LLM engineer, Firebase architect, RAG engineer, security engineer, QA engineer and technical documentation specialist.
+
+You are responsible for completing my existing final-year B.Tech Computer Science Engineering project.
+
+**Project name: HealthMate AI**
+
+Your task is to inspect, repair, complete, test, document and package the existing application into a final working project.
+
+I have already spent considerable time and resources developing this application. Do not waste tokens rebuilding it from scratch, repeatedly redesigning existing pages, or explaining what you intend to do.
+
+Work directly with the existing source code.
+
+Make sensible engineering decisions independently. Complete all possible work in one continuous implementation process.
+
+Do not stop after planning, auditing or identifying issues. Actually implement the fixes.
+
+Do not ask for approval after each phase. Ask questions only if an essential external credential or configuration is genuinely unavailable.
+
+---
+
+# 2. MAIN PROJECT OBJECTIVE
+
+HealthMate AI is an intelligent healthcare assistance and health-document analysis platform that demonstrates practical Large Language Model concepts through a complete full-stack application.
+
+The application should help users:
+
+- Upload and understand medical documents.
+- Ask questions about their health reports.
+- Receive grounded answers using Retrieval-Augmented Generation.
+- Track health measurements over time.
+- Understand health trends.
+- Receive nutrition recommendations.
+- Generate personalized meal plans.
+- Track wellness activities and habits.
+- Receive general health education.
+- Interact with multiple specialized AI agents.
+- Explore and understand the LLM architecture through an LLM Lab.
+
+This is an academic decision-support and educational application.
+
+It must not claim to diagnose diseases, prescribe medication, replace healthcare professionals, or provide emergency medical treatment.
+
+The application must be accessible immediately as a guest without Google login, email login, registration or a conventional login screen.
+
+---
+
+# 3. IMPORTANT IMPLEMENTATION RULES
+
+Before changing anything:
+
+1. Inspect the entire existing source code.
+2. Identify the existing architecture, framework, dependencies and services.
+3. Read the README, configuration, environment files, routes, authentication, database, agents, RAG implementation and tests.
+4. Identify which requirements are already implemented.
+5. Identify incomplete, broken, duplicated, insecure or misleading functionality.
+6. Prepare an internal implementation checklist.
+7. Preserve working features.
+8. Modify only what needs modification.
+9. Do not create duplicate services or unnecessary alternative implementations.
+10. Do not remove existing features simply to make the project easier to complete.
+
+**Do not rebuild the project from scratch.**
+
+**Do not replace the existing technology stack.**
+
+**Do not remove the eight application pages.**
+
+**Do not replace real functionality with mock responses, hardcoded examples or placeholder buttons.**
+
+If a feature depends on unavailable external credentials, implement its integration properly, provide a clear configuration process and report that the live integration remains unverified.
+
+---
+
+# 4. REQUIRED TECHNOLOGY STACK
+
+Preserve and complete the existing architecture.
+
+The current project is based on:
+
+- React
+- TypeScript
+- Vite
+- Node.js
+- Express
+- Firebase Authentication
+- Firebase Firestore
+- Firebase Admin SDK
+- Google Gemini API
+- Gemini embeddings
+- Persistent SQLite-based RAG vector storage
+- Zod validation
+- Vitest testing
+- Recharts and existing UI dependencies
+
+Use the existing dependencies wherever possible.
+
+Do not introduce unnecessary technologies or large dependencies.
+
+Do not expose Gemini API keys or Firebase Admin credentials to the browser.
+
+Keep all sensitive API operations on the backend.
+
+---
+
+# 5. LOGIN-FREE GUEST ACCESS — MANDATORY
+
+This is one of the most important requirements.
+
+I do not want users to see a login screen.
+
+The application must open directly into the dashboard.
+
+## 5.1 Firebase Anonymous Authentication
+
+Implement Firebase Anonymous Authentication correctly.
+
+Requirements:
+
+- Use `signInAnonymously(auth)`.
+- Automatically create an anonymous Firebase user when no current session exists.
+- Do not require Google authentication.
+- Do not require an email address.
+- Do not require a password.
+- Do not require registration.
+- Do not display a conventional login screen.
+- Show a loading screen while authentication is being initialized.
+- Navigate directly to the dashboard after authentication succeeds.
+- Display a friendly retry/error screen if Firebase authentication fails.
+- Never silently bypass authentication.
+- Use the Firebase UID as the unique identity for each guest.
+
+The guest should experience the application as completely login-free.
+
+Explain in the README that anonymous Firebase authentication operates in the background to securely isolate guest data.
+
+## 5.2 Remove old authentication mechanisms
+
+Completely remove obsolete authentication paths from the normal application:
+
+- Google sign-in buttons.
+- Google sign-in functions.
+- Google provider dependencies that are no longer required.
+- Email/password login UI.
+- Registration UI.
+- `guest-session-<uid>` authentication.
+- `demo-academic-token` authentication.
+- `demo-session-*` authentication.
+- Shared demo user IDs.
+- Client-generated identities trusted by the backend.
+- Development authentication bypasses that could accidentally be enabled in a deployed application.
+
+If tests require simulated authentication, use isolated test-only mocks. Never create a production or development API authentication bypass.
+
+## 5.3 Secure backend authentication
+
+Every protected backend request must:
+
+1. Receive a Firebase ID token in the Authorization header.
+2. Verify the token using Firebase Admin SDK.
+3. Validate its signature, issuer, audience and expiry.
+4. Reject missing or invalid tokens.
+5. Reject fabricated tokens.
+6. Reject expired tokens.
+7. Reject old demo tokens.
+8. Derive the authenticated UID exclusively from the verified token.
+9. Never trust a UID supplied in request parameters or request bodies as proof of identity.
+
+Valid Firebase anonymous users must be accepted.
+
+The backend must distinguish anonymous users from administrators using verified server-side identity and authorization rules.
+
+## 5.4 Guest data isolation
+
+Each guest must have a unique Firebase UID.
+
+All user-owned data must be scoped to that UID.
+
+This includes:
+
+- Health profiles.
+- Uploaded documents.
+- Extracted medical information.
+- Document chunks.
+- RAG embeddings.
+- Conversations.
+- Conversation memory.
+- Health measurements.
+- Nutrition preferences.
+- Meal plans.
+- Wellness goals.
+- Habit records.
+- Activity records.
+- Reports.
+- User-specific evaluation records.
+
+One guest must never access another guest's data.
+
+Implement ownership validation in both backend services and Firestore security rules.
+
+Do not rely only on frontend filtering.
+
+## 5.5 Guest persistence
+
+Guest data should persist across page refreshes and normal browser restarts when the Firebase anonymous session remains available.
+
+Use Firestore for user data persistence.
+
+Use the existing persistent SQLite vector store for RAG data if that is the established architecture.
+
+Do not silently replace Firestore with localStorage.
+
+localStorage may be used for harmless interface preferences, but not as a disguised replacement for cloud health-data persistence.
+
+Explain that anonymous guest data may not be recoverable after clearing browser storage or losing the anonymous Firebase session, and that guests cannot automatically access it from another device.
+
+## 5.6 Guest profile
+
+The application should initially display:
+
+**Guest User**
+
+Do not fabricate personal health details.
+
+Do not prepopulate age, height, weight, allergies, medical conditions or health measurements with synthetic personal values.
+
+All personal profile fields should be optional until supplied by the guest.
+
+Do not assume that demonstration data belongs to the guest.
+
+If example data is needed, mark it clearly as synthetic demonstration data and keep it separate from actual user records.
+
+## 5.7 Guest reset and data deletion
+
+Implement a proper reset guest session feature.
+
+Before resetting, display a confirmation explaining which records will be permanently deleted.
+
+Delete all user-owned records, including:
+
+- Firestore profile records.
+- Health documents.
+- Document chunks.
+- Extracted document values.
+- Conversations.
+- Memories.
+- Measurements.
+- Tracker records.
+- Meal plans.
+- Nutrition preferences.
+- Wellness records.
+- Habits.
+- Reports.
+- User-specific RAG chunks and embeddings.
+- Other user-owned application records discovered during inspection.
+
+Important:
+
+- Preserve system-global medical knowledge and shared application configuration.
+- Never delete another guest's data.
+- Verify ownership using the authenticated Firebase UID.
+- Delete records through authorized server-side operations wherever appropriate.
+- Handle Firestore collection deletion safely in batches.
+- Handle large datasets.
+- Handle partial failures.
+- Do not suppress deletion errors.
+- Do not report success if some required records remain.
+- Implement retryable cleanup for incomplete deletions.
+- Do not create a new anonymous session until the previous guest's deletion has succeeded.
+- After successful deletion, sign out the previous guest and create a new anonymous Firebase session.
+- Show a clear success or failure message.
+
+Do not claim complete deletion unless every required deletion has been confirmed.
+
+---
+
+# 6. ADMINISTRATOR SECURITY
+
+Inspect all administrator functionality.
+
+Requirements:
+
+- Remove hardcoded administrator email defaults.
+- Configure administrator access using server-side environment variables.
+- Prefer a verified Firebase UID allowlist.
+- Fail closed if administrator configuration is missing.
+- Do not give anonymous guests administrator privileges.
+- Protect administrator-only API endpoints.
+- Do not rely on frontend route hiding for authorization.
+- Do not trust an email address supplied by the client.
+- Keep administrator configuration out of public frontend code.
+
+---
+
+# 7. THE EIGHT REQUIRED APPLICATION PAGES
+
+All eight pages must remain accessible immediately after guest authentication.
+
+Do not remove or combine them.
+
+## Page 1: Dashboard
+
+Implement:
+
+- Personalized welcome message.
+- Guest User status.
+- Health overview.
+- Latest health measurements.
+- Document count.
+- Health trend summary.
+- Nutrition summary.
+- Wellness progress.
+- Recent activities.
+- Quick access to major features.
+- Useful charts and visualizations.
+
+Never display fabricated health metrics as actual user data.
+
+If no user data exists, show a helpful empty state explaining how to get started.
+
+## Page 2: Health Documents
+
+Implement:
+
+- PDF upload.
+- Image upload where supported.
+- File type and size validation.
+- Document storage.
+- Text extraction.
+- Medical value extraction.
+- Reference range extraction.
+- Abnormal-value identification.
+- Structured document summaries.
+- Document preview.
+- Extracted value review.
+- User verification and correction.
+- Re-indexing after user corrections.
+- Source attribution.
+- Processing status.
+- Error handling.
+
+Supported medical information may include:
+
+- Blood glucose.
+- HbA1c.
+- Hemoglobin.
+- Cholesterol.
+- LDL.
+- HDL.
+- Triglycerides.
+- Creatinine.
+- Urea.
+- TSH.
+- Vitamin levels.
+- Blood pressure when supplied.
+- Other values actually identified in the uploaded document.
+
+Do not invent missing values or reference ranges.
+
+Preserve units, reference ranges, source document and extraction confidence where available.
+
+Extracted medical values must initially be marked unverified.
+
+Only user-approved or appropriately verified values should be treated as verified.
+
+Do not confuse extracted data with a confirmed diagnosis.
+
+## Page 3: AI Health Assistant
+
+Implement a conversational health assistant.
+
+It must support:
+
+- General health education.
+- Questions about uploaded reports.
+- Context-aware responses.
+- RAG-based retrieval.
+- Source references.
+- Conversation history.
+- Follow-up questions.
+- User-specific memory where consented.
+- Safe handling of medical uncertainty.
+- Emergency warning guidance.
+
+The assistant must distinguish between:
+
+1. General health knowledge.
+2. Information retrieved from the user's documents.
+3. Information supplied directly by the user.
+4. Calculated values.
+5. Information that is uncertain or unavailable.
+
+Never fabricate medical records or pretend that a document was uploaded when it was not.
+
+## Page 4: Food & Nutrition
+
+Implement:
+
+- Dietary preference selection.
+- Vegetarian and non-vegetarian options.
+- Indian food recommendations.
+- Regional Indian meal options where practical.
+- Allergy restrictions.
+- Food exclusions.
+- Budget preferences.
+- Goal-based meal planning.
+- Daily meal plans.
+- Breakfast, lunch, dinner and snacks.
+- Approximate calorie calculations.
+- Macronutrient estimates.
+- Food substitutions.
+- Nutrition explanations.
+
+Use deterministic calculations where appropriate.
+
+Do not invent exact nutrition facts when reliable data is unavailable.
+
+Label estimates clearly.
+
+Allergies and dietary restrictions must be respected.
+
+Do not recommend unsafe extreme diets or claim that food can cure medical conditions.
+
+## Page 5: Health Tracker
+
+Implement:
+
+- Weight tracking.
+- Blood pressure tracking.
+- Blood glucose tracking.
+- Other relevant health measurements.
+- Measurement history.
+- Date-based records.
+- Charts.
+- Trend analysis.
+- Unit handling.
+- Data validation.
+- User-specific persistence.
+
+Do not invent measurement entries.
+
+Use actual user-supplied or verified document data.
+
+## Page 6: Wellness Planner
+
+Implement:
+
+- Daily habits.
+- Sleep tracking.
+- Water intake.
+- Physical activity.
+- Exercise goals.
+- Meditation.
+- Stress-management activities.
+- Habit completion.
+- Daily and weekly progress.
+- Reminders where supported.
+- Personalized wellness suggestions.
+
+Keep recommendations practical and safe.
+
+Do not imply that this page replaces professional mental healthcare.
+
+## Page 7: Reports & Insights
+
+Implement:
+
+- Health trend analysis.
+- Historical measurement comparisons.
+- Report summaries.
+- Nutrition summaries.
+- Wellness progress.
+- Abnormal-value tracking.
+- Meaningful visualizations.
+- Date filters.
+- Export options where already supported or practical.
+
+All displayed statistics must come from actual stored records or clearly identified calculations.
+
+Never fabricate improvements, health scores or trends.
+
+## Page 8: LLM Lab
+
+This is a particularly important academic feature.
+
+It must demonstrate the underlying LLM engineering concepts rather than merely display a chatbot.
+
+Implement and connect the following sections.
+
+### A. Prompt Engineering Playground
+- System prompts.
+- User prompts.
+- Prompt templates.
+- Parameter configuration where supported.
+- Prompt comparison.
+- Output inspection.
+
+### B. RAG Inspector
+- Document selection.
+- Chunk inspection.
+- Embedding status.
+- Similarity scores.
+- Top-K retrieval.
+- Retrieved source display.
+- Grounded answer comparison.
+- Retrieval debugging.
+
+### C. Standard LLM vs RAG Comparison
+Allow users to compare:
+- Normal Gemini response.
+- Gemini response using retrieved document context.
+
+Show the retrieved sources and explain differences in grounding.
+
+### D. Agent Routing Visualizer
+Show:
+- User query.
+- Intent classification.
+- Selected agent.
+- Routing decision.
+- Tools invoked.
+- Agent output.
+- Final orchestrator response.
+
+### E. Tool Calling Laboratory
+Demonstrate controlled function calling with actual deterministic functions.
+
+### F. Memory Inspector
+Show:
+- Current conversation context.
+- User-approved saved memory.
+- Memory retrieval.
+- Memory update and deletion.
+- Consent controls.
+
+### G. Evaluation Laboratory
+Show:
+- Evaluation datasets.
+- Test cases.
+- Expected behaviour.
+- Actual outputs.
+- Scores.
+- Failure analysis.
+
+### H. Observability
+Show real execution information such as:
+- Agent execution.
+- Latency.
+- Tool calls.
+- Retrieval count.
+- Errors.
+- Token usage when available.
+- Model response status.
+
+Do not display fabricated token counts, benchmark scores or execution metrics.
+
+---
+
+# 8. MULTI-AGENT AI ARCHITECTURE
+
+Implement five genuinely separate specialist agents and one central orchestrator.
+
+Do not make them simple UI labels.
+
+Each agent must have a defined responsibility, input/output structure, validation, error handling and execution logging.
+
+## Agent 1: Health Document Agent
+
+Responsibilities:
+
+- Understand uploaded medical documents.
+- Extract relevant information.
+- Summarize reports.
+- Identify abnormal values relative to supplied reference ranges.
+- Answer questions about document contents.
+- Use RAG retrieval.
+- Attribute information to source documents.
+- Explain uncertainty.
+- Avoid diagnosis.
+
+## Agent 2: Health Trend Analysis Agent
+
+Responsibilities:
+
+- Analyze historical health measurements.
+- Compare values over time.
+- Identify upward and downward trends.
+- Identify unusual changes.
+- Summarize trends.
+- Use deterministic calculations for numerical comparisons.
+- Distinguish observed trends from medical conclusions.
+
+## Agent 3: Nutrition Agent
+
+Responsibilities:
+
+- Understand dietary preferences.
+- Respect allergies.
+- Generate meal plans.
+- Suggest Indian food options.
+- Estimate calories and macronutrients.
+- Provide food substitutions.
+- Use deterministic calculations where appropriate.
+
+## Agent 4: Wellness and Habit Agent
+
+Responsibilities:
+
+- Analyze user-entered habits.
+- Track wellness progress.
+- Suggest realistic habit improvements.
+- Help plan sleep, hydration and physical activity.
+- Encourage consistent and safe routines.
+
+## Agent 5: General Health Knowledge Agent
+
+Responsibilities:
+
+- Answer general health education questions.
+- Explain medical terminology.
+- Provide general preventive health information.
+- Explain common laboratory measurements.
+- Use trusted retrieved knowledge where available.
+- Communicate uncertainty.
+- Avoid diagnosis and prescriptions.
+
+## Central Orchestrator
+
+Implement an actual central coordinator that:
+
+1. Receives the user query.
+2. Classifies user intent.
+3. Determines relevant context.
+4. Selects one or more appropriate agents.
+5. Retrieves relevant user documents or knowledge when required.
+6. Invokes permitted tools.
+7. Validates outputs.
+8. Handles agent failures.
+9. Combines agent results where appropriate.
+10. Applies medical safety rules.
+11. Produces the final response.
+12. Logs the execution.
+
+Use structured outputs and validated schemas.
+
+Avoid routing every query to every agent.
+
+Provide a fallback when intent classification is uncertain.
+
+Show the routing explanation in the LLM Lab.
+
+---
+
+# 9. RETRIEVAL-AUGMENTED GENERATION — MANDATORY
+
+RAG must be genuinely implemented.
+
+Do not simulate RAG by placing arbitrary document text into a prompt.
+
+Implement:
+
+## Document ingestion
+1. Receive an uploaded document.
+2. Validate it.
+3. Extract text.
+4. Normalize text.
+5. Split it into meaningful chunks.
+6. Preserve document IDs and metadata.
+7. Generate embeddings using the Gemini embedding API.
+8. Store embeddings persistently.
+9. Associate chunks with the authenticated UID.
+10. Track processing and verification status.
+
+## Retrieval
+1. Receive a user query.
+2. Generate a query embedding.
+3. Search the appropriate user-specific vector collection.
+4. Calculate similarity.
+5. Retrieve top-K relevant chunks.
+6. Apply user ownership filtering.
+7. Include useful source metadata.
+8. Pass retrieved context to Gemini.
+9. Generate a grounded answer.
+10. Show relevant sources to the user.
+
+Implement cosine similarity correctly.
+
+Handle missing embeddings and embedding API failures.
+
+If lexical retrieval is used as a fallback, identify it accurately.
+
+Do not describe lexical search as vector similarity.
+
+Do not return another guest's document chunks.
+
+Do not expose one user's retrieved information to another user.
+
+## Persistent vector storage
+
+Preserve the existing SQLite-based vector store if it is correctly implemented.
+
+Requirements:
+
+- Persistent database file.
+- Proper schema.
+- User ownership.
+- Document metadata.
+- Embedding storage.
+- Similarity retrieval.
+- Update and deletion operations.
+- Error handling.
+- Appropriate indexes where useful.
+
+Do not replace the existing RAG architecture without a genuine technical reason.
+
+Document the persistence and deployment limitations of SQLite, particularly for multi-instance deployment.
+
+---
+
+# 10. GEMINI INTEGRATION
+
+Use Gemini through the backend.
+
+Implement:
+
+- Model configuration.
+- Text generation.
+- Structured output where useful.
+- Gemini embedding generation.
+- Error handling.
+- Retry handling for appropriate transient failures.
+- Rate-limit handling.
+- Request validation.
+- Timeout handling.
+- Token usage tracking when available.
+- Safe prompt construction.
+
+Keep `GEMINI_API_KEY` on the server.
+
+Never expose it in frontend JavaScript, browser bundles, API responses or logs.
+
+Do not use fabricated responses when Gemini fails.
+
+Display a clear error and allow retry.
+
+Keep deterministic calculations separate from LLM-generated explanations.
+
+The application should clearly identify which operations use an LLM and which are normal application logic.
+
+---
+
+# 11. TOOL AND FUNCTION CALLING
+
+Implement controlled tools for operations that should not depend on free-form LLM reasoning.
+
+Examples:
+
+- BMI calculation.
+- Health measurement comparison.
+- Trend calculations.
+- Nutrition calculations.
+- Date and age calculations where appropriate.
+- Document retrieval.
+- User-specific data retrieval.
+- Habit progress calculations.
+
+Each tool must have:
+
+- Defined input schema.
+- Defined output schema.
+- Validation.
+- Permission checks.
+- Error handling.
+- Execution logs.
+
+The LLM may request an allowed tool.
+
+The backend must validate and execute it.
+
+Never allow the LLM to execute arbitrary shell commands, arbitrary SQL, unrestricted network requests or unrestricted code.
+
+---
+
+# 12. MEDICAL SAFETY AND PRIVACY
+
+Implement medical safety rules across every relevant agent and page.
+
+Requirements:
+
+- No definitive diagnosis.
+- No prescription recommendations.
+- No medication dosage instructions.
+- No false reassurance.
+- No unsupported treatment claims.
+- No interpretation beyond available evidence.
+- Clear uncertainty statements.
+- Encourage professional consultation for concerning results.
+- Provide emergency guidance for potentially urgent symptoms.
+
+Detect relevant emergency patterns and provide appropriate guidance to contact local emergency services or seek urgent medical care.
+
+Do not delay emergency guidance by running unnecessary agents or retrieval steps.
+
+Protect personal health information.
+
+- Do not log raw medical documents.
+- Do not log API keys.
+- Do not log passwords or tokens.
+- Avoid exposing sensitive health information in errors.
+- Validate uploads.
+- Limit file size.
+- Restrict file types.
+- Protect against malicious file uploads.
+- Protect against prompt injection in uploaded documents.
+- Treat uploaded document content as untrusted data, not system instructions.
+- Add rate limiting.
+- Apply secure CORS and security headers.
+- Use least-privilege access.
+
+---
+
+# 13. FIRESTORE AND DATABASE PERSISTENCE
+
+Inspect the existing Firestore service and complete it.
+
+Requirements:
+
+- Correct collection structure.
+- User-specific ownership.
+- Secure Firestore rules.
+- Consistent UID usage.
+- Correct create/read/update/delete behaviour.
+- Proper pagination or batching where required.
+- Useful error handling.
+- No silent localStorage substitution.
+- No shared guest data.
+- No fabricated default personal records.
+
+Verify that all eight pages use the correct persistence layer.
+
+Verify that server-side RAG data and Firestore user records remain consistent.
+
+Document which data is stored in Firestore and which is stored in SQLite.
+
+---
+
+# 14. LLM EVALUATION SUITE
+
+Implement a real evaluation suite with at least 40 meaningful test cases where practical.
+
+Include:
+
+## Agent routing tests
+- Document questions.
+- Nutrition questions.
+- Trend questions.
+- Wellness questions.
+- General health questions.
+- Ambiguous questions.
+- Multi-intent questions.
+
+## RAG tests
+- Relevant document retrieval.
+- Irrelevant retrieval.
+- Missing documents.
+- Missing embeddings.
+- User isolation.
+- Source attribution.
+- Grounded answer behaviour.
+
+## Safety tests
+- Diagnosis requests.
+- Prescription requests.
+- Dangerous medical advice.
+- Emergency symptoms.
+- Prompt injection.
+- Unverified document values.
+- Uncertainty handling.
+
+## Tool tests
+- BMI.
+- Nutrition calculations.
+- Trend calculations.
+- Invalid input.
+- Missing values.
+- Boundary values.
+
+## Evaluation metrics
+
+Where appropriate, calculate:
+
+- Routing accuracy.
+- Retrieval precision.
+- Retrieval recall.
+- Answer relevance.
+- Groundedness.
+- Source attribution correctness.
+- Safety compliance.
+- Tool execution correctness.
+
+Clearly distinguish deterministic automated tests from subjective LLM-as-judge evaluations.
+
+Do not fabricate benchmark results.
+
+Store evaluation outputs where appropriate.
+
+---
+
+# 15. SECURITY AND COMPLIANCE TESTS
+
+Create or correct tests for all of the following:
+
+### Authentication
+1. Missing Authorization header is rejected.
+2. Invalid token is rejected.
+3. Expired token is rejected.
+4. Invalid signature is rejected.
+5. Incorrect issuer is rejected.
+6. Incorrect audience is rejected.
+7. Fabricated `guest-session-<uid>` token is rejected.
+8. `demo-academic-token` is rejected.
+9. `demo-session-*` is rejected.
+10. Valid Firebase anonymous token is accepted.
+11. Backend identity comes from verified Firebase token.
+12. Client-supplied UID cannot override verified identity.
+
+### Authorization
+13. Guest A cannot access Guest B's records.
+14. Guest A cannot retrieve Guest B's RAG chunks.
+15. Guest A cannot delete Guest B's documents.
+16. Anonymous guests cannot access administrator endpoints.
+17. Unconfigured administrator access fails closed.
+
+### Reset
+18. All user-owned Firestore collections are deleted.
+19. `documentChunks` is included.
+20. User-owned RAG chunks are deleted.
+21. Global knowledge remains untouched.
+22. Other users' data remains untouched.
+23. Deletion failures are reported.
+24. Partial deletion can be retried.
+25. New anonymous session is created only after successful cleanup.
+
+### Other tests
+26. Document upload validation.
+27. Document extraction.
+28. User verification workflow.
+29. Embedding generation failure.
+30. RAG retrieval.
+31. Agent routing.
+32. Tool validation.
+33. Medical safety.
+34. Nutrition calculations.
+35. Trend analysis.
+36. Firestore error handling.
+37. SQLite persistence.
+38. API rate limiting.
+39. Prompt injection protection.
+40. LLM evaluation execution.
+
+Use mocks for external services where appropriate, but label mocked tests clearly.
+
+Never modify tests simply to hide real implementation failures.
+
+Tests must verify intended behaviour.
+
+---
+
+# 16. FIX ALL PREVIOUSLY IDENTIFIED ISSUES
+
+Specifically inspect and correct these issues from previous versions:
+
+1. Remove all `guest-session-<uid>` authentication paths.
+2. Remove `demo-academic-token` and `demo-session-*` bypasses from the normal application.
+3. Remove hardcoded administrator email defaults.
+4. Use verified server-side administrator UID authorization.
+5. Include `documentChunks` in guest data deletion.
+6. Include all other user-owned collections discovered during inspection.
+7. Do not suppress errors during profile deletion.
+8. Do not claim successful reset after partial deletion.
+9. Implement retryable cleanup.
+10. Correct security tests that expect old authentication bypasses.
+11. Ensure frontend API calls fail clearly when Firebase token retrieval fails.
+12. Ensure every backend route uses correct authentication and authorization.
+13. Ensure no shared demo UID remains.
+14. Remove synthetic personal health details from default profiles.
+15. Remove fake dashboard health metrics.
+16. Remove fake LLM observability metrics.
+17. Remove fake evaluation scores.
+18. Ensure all buttons perform their advertised action.
+19. Ensure no page is just a static placeholder.
+20. Update README and architecture documentation.
+21. Correct outdated references to Google login or demo-token authentication.
+22. Ensure no secret credentials are included in the final ZIP.
+
+Search the entire project for related code, not only the files previously identified.
+
+---
+
+# 17. USER INTERFACE AND DESIGN
+
+Preserve the existing teal healthcare SaaS design.
+
+Suggested design palette:
+
+- Sidebar: `#07566A`
+- Primary: `#0FAEAE`
+- Aqua accent: `#21C4B8`
+- Background: `#F4F8FA`
+- Cards: white
+
+Maintain:
+
+- Clean modern layout.
+- Consistent typography.
+- Responsive sidebar.
+- Professional healthcare dashboard.
+- Clear empty states.
+- Loading states.
+- Error states.
+- Success feedback.
+- Accessible forms.
+- Responsive charts.
+- Clear navigation.
+
+The guest interface should display:
+
+- Guest User.
+- Guest Session.
+- Guest Profile.
+- Reset Guest Data.
+
+Do not reintroduce login or signup UI.
+
+Do not redesign working screens unnecessarily.
+
+---
+
+# 18. DOCUMENTATION
+
+Update the existing README and create or update technical documentation.
+
+README must include:
+
+1. Project introduction.
+2. Problem statement.
+3. Objectives.
+4. Features.
+5. Eight application pages.
+6. Technology stack.
+7. Architecture.
+8. Five-agent design.
+9. Orchestrator workflow.
+10. RAG implementation.
+11. Gemini integration.
+12. Embedding generation.
+13. Database structure.
+14. Guest authentication.
+15. Data isolation.
+16. Reset behaviour.
+17. Firebase configuration.
+18. Gemini API configuration.
+19. Environment variables.
+20. Installation instructions.
+21. Startup instructions.
+22. Testing instructions.
+23. Known limitations.
+24. Troubleshooting.
+
+Create or update:
+
+- `docs/architecture.md`
+- `docs/agents.md`
+- `docs/rag_architecture.md`
+- `docs/database_schema.md`
+- `docs/security.md`
+- `docs/testing.md`
+- `docs/evaluation.md`
+- `docs/final_year_project_report.md`
+
+Include architecture diagrams using Mermaid where useful.
+
+Do not document features that do not actually exist.
+
+Do not claim production readiness without evidence.
+
+---
+
+# 19. FINAL-YEAR B.TECH PROJECT AND VIVA PREPARATION
+
+The project must clearly demonstrate these academic concepts:
+
+1. Large Language Models.
+2. Prompt engineering.
+3. System prompts.
+4. Multi-agent architecture.
+5. Intent classification.
+6. Agent orchestration.
+7. Retrieval-Augmented Generation.
+8. Document chunking.
+9. Embeddings.
+10. Cosine similarity.
+11. Top-K retrieval.
+12. Grounded generation.
+13. Source attribution.
+14. Tool calling.
+15. Deterministic calculations.
+16. Conversational memory.
+17. User-approved persistent memory.
+18. LLM evaluation.
+19. Routing evaluation.
+20. Safety evaluation.
+21. API integration.
+22. Full-stack architecture.
+23. Authentication and authorization.
+24. Data privacy.
+25. Database persistence.
+
+Ensure the code and documentation allow me to explain these concepts during my project demonstration and viva.
+
+Create a concise viva preparation document with:
+
+- System architecture explanation.
+- Agent responsibilities.
+- Orchestrator workflow.
+- RAG explanation.
+- Embedding explanation.
+- Cosine similarity explanation.
+- Gemini integration explanation.
+- Tool calling explanation.
+- Authentication explanation.
+- Security explanation.
+- Evaluation methodology.
+- Important limitations.
+- Possible viva questions and accurate answers.
+
+Do not invent experimental results.
+
+---
+
+# 20. FINAL TESTING AND VERIFICATION
+
+This phase is mandatory.
+
+Do not claim that the project works simply because the source code exists.
+
+Install dependencies and execute the actual available commands.
+
+Run:
+
+```bash
+npm install
+npm run lint
+npm run test
+npm run build
+```
+
+Also inspect:
+
+- TypeScript compilation.
+- Frontend imports.
+- Backend startup.
+- Route registration.
+- Environment configuration.
+- Firestore rules.
+- Firebase Admin configuration.
+- SQLite database initialization.
+- RAG ingestion and retrieval.
+- Gemini integration.
+- Guest authentication.
+- Reset workflow.
+- All eight pages.
+
+Fix all errors that can be fixed in the available environment.
+
+If external Firebase or Gemini credentials are unavailable:
+
+- Do not invent credentials.
+- Do not pretend live integration succeeded.
+- Run mocked tests where appropriate.
+- Identify the integration tests that could not be executed.
+- Explain exactly how I can verify them locally.
+
+Report exact results:
+
+| Check | Command | Result |
+|---|---|---|
+| Dependency installation | npm install | Actual result |
+| TypeScript/lint | npm run lint | Actual result |
+| Tests | npm run test | Passed/failed/skipped |
+| Production build | npm run build | Actual result |
+| Firebase integration | Actual verification | Verified/not verified |
+| Gemini integration | Actual verification | Verified/not verified |
+| Guest reset | Actual verification | Verified/not verified |
+
+Never fabricate test counts or success messages.
+
+---
+
+# 21. FINAL ZIP DELIVERY — MANDATORY
+
+After all possible corrections and tests, package the final project into one ZIP file named:
+
+`HealthMate_AI_Final.zip`
+
+Include:
+
+- Complete frontend source.
+- Complete backend source.
+- All eight pages.
+- Five agent implementations.
+- Central orchestrator.
+- Gemini integration.
+- Embedding integration.
+- RAG implementation.
+- Database initialization and schema.
+- Firestore security rules.
+- Environment example.
+- README.
+- Technical documentation.
+- Viva preparation document.
+- Evaluation suite.
+- Automated tests.
+- Configuration files.
+- Required static assets.
+- Package manifest and lockfile.
+
+Exclude:
+
+- Real `.env` files.
+- API keys.
+- Firebase Admin private keys.
+- Service account credentials.
+- `node_modules`.
+- Temporary files.
+- Build caches.
+- Debug logs containing private information.
+- Unnecessary large files.
+
+Include `.env.example` with placeholders only.
+
+Before delivery:
+
+1. Confirm the ZIP exists.
+2. Confirm it is not empty.
+3. Confirm it can be opened.
+4. Inspect its contents.
+5. Confirm essential source files are included.
+6. Confirm no secrets are included.
+7. Confirm the README matches the implementation.
+8. Confirm the ZIP contains the complete project.
+9. Confirm tests and build results are accurately reported.
+
+Do not provide a link to a ZIP that was not actually created and verified.
+
+---
+
+# 22. FINAL RESPONSE FORMAT
+
+After implementation, provide one concise but complete delivery report containing:
+
+1. Final ZIP download link.
+2. Summary of completed changes.
+3. Guest authentication status.
+4. Security improvements.
+5. Guest data deletion status.
+6. Eight-page feature status.
+7. Five-agent architecture status.
+8. RAG implementation status.
+9. Gemini integration status.
+10. Database persistence status.
+11. LLM Lab status.
+12. Evaluation suite status.
+13. Exact test results.
+14. Exact build results.
+15. External configurations still required.
+16. Known limitations.
+17. Installation and startup instructions.
+18. Firebase setup instructions.
+19. Gemini API setup instructions.
+20. A short demonstration workflow.
+21. Viva preparation document location.
+
+Use these labels honestly:
+
+- COMPLETE — implemented and verified.
+- IMPLEMENTED — code exists but runtime verification is incomplete.
+- PARTIAL — only some functionality works.
+- NOT IMPLEMENTED — missing.
+- NOT VERIFIED — cannot be confirmed in the available environment.
+
+Do not describe the entire project as complete if critical features are missing or unverified.
+
+---
+
+# 23. FINAL INSTRUCTIONS
+
+This is the final completion pass.
+
+Do not repeatedly audit the same files without implementing fixes.
+
+Do not spend the response explaining what you will do.
+
+Do not create another planning-only response.
+
+Do not rebuild the application.
+
+Do not remove working features.
+
+Do not weaken authentication or security.
+
+Do not fabricate health information, LLM metrics, benchmark results, test results or live integrations.
+
+Do not leave core functionality as TODO comments.
+
+Prioritize fixing existing problems, completing unfinished features, executing verification and producing the final ZIP.
+
+Use the available token budget efficiently. Work in logical batches and continue through all implementation phases without asking for approval after each phase.
+
+**Your final objective is to deliver the complete, secure, login-free HealthMate AI project, with all eight pages, genuine multi-agent LLM functionality, persistent RAG, accurate documentation, tested code and a verified final ZIP.**
