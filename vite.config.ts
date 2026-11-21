@@ -12,6 +12,7 @@ export default defineConfig(() => {
     },
     server: {
       port: 5173,
+      allowedHosts: ['ydxvj4-5173.csb.app'],
       proxy: {
         '/api': {
           target: 'http://localhost:3000',
